@@ -57,7 +57,7 @@ aptitude install git-core
 aptitude install mysql-server
 /etc/init.d/mysql start
 
-#Скачиваем конигурационные скрипты 
+#Скачиваем конфигурационные скрипты
 cd /srv/www/
 git clone https://github.com/demon2009g/mpak.su.config.git
 

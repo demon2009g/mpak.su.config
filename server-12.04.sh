@@ -8,13 +8,17 @@
 # Остановка /etc/init.d/apache2 stop
 # Запуск /etc/init.d/apache2 start
 
-apt-get update # Обновление всех источников
-apt-get upgrade # Обновление всех программ
+sudo apt-get update # Обновление всех источников
+sudo apt-get upgrade # Обновление всех программ
+sudo apt-get install aptitude # Устанавливает манагер приложений под линукс
 
-aptitude install iftop # Программа монитор сетевых соединений
-aptitude install aptitude # Устанавливает манагер приложений под линукс
-aptitude install apache2 # Стандартный веб сервер
-aptitude install php5 libapache2-mod-php5 php5-cli php5-mysql # ДОполнительные модули к апачу
+sudo aptitude install console-cyrillic
+
+sudo aptitude install iftop # Программа монитор сетевых соединений
+sudo aptitude install atop  # Программа монитор ресурсов
+sudo aptitude install apache2 # Стандартный веб сервер
+sudo aptitude install php5 libapache2-mod-php5 php5-cli php5-mysql # ДОполнительные модули к апачу
+sudo aptitude install libcurl3 libcurl3-dev php5-curl
 
 #export LANGUAGE=ru_RU.UTF-8 # Что то с кодировкой
 #export LC_ALL=ru_RU.UTF-8
@@ -53,8 +57,13 @@ aptitude install git-core
 aptitude install mysql-server
 /etc/init.d/mysql start
 
-#cd /srv/www/vhosts/
-#git clone https://github.com/mpak2/mpak.su.git mpak.cms
+#Скачиваем конигурационные скрипты 
+cd /srv/www/
+git clone https://github.com/demon2009g/mpak.su.config.git
+
+#Скачиваем движок
+cd /srv/www/vhosts/
+git clone https://github.com/mpak2/mpak.su.git mpak.cms
 
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid

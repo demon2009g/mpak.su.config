@@ -26,8 +26,8 @@ sudo aptitude install php5 php5-cli php-pear				  # PHP
 sudo aptitude install mysql-server mysql-client php5-mysql	  # MySQL
 # Дополнительные модули к php
 sudo aptitude install php5-curl php5-gd php5-idn php5-imagick \
-php5-ldap php5-imap php5-memcache php5-mhash php5-ps php5-pspell\ 
-php5-sqlite php5-suhosin php5-tidy imagemagick php5-xcache 
+php5-ldap php5-imap php5-memcache php5-mhash php5-ps php5-pspell \
+php5-sqlite php5-suhosin php5-tidy imagemagick php5-xcache \
 php5-xdebug php5-xmlrpc php5-xsl 
 
 sudo aptitude install phpmyadmin # Ставим phpMyAdmin

@@ -7,6 +7,18 @@
 	$all_sites = array(); //массив со всеми собранными сайтами	
 	$srv_dir = scandir($srv_path); //сканируем дирректорию сервера
 	$path_engine = array();//путь к движку
+	
+	
+	//проверяем версию апача
+	exec("apache2 -v",$version);	
+	if($version = floatval(preg_replace("#^.*Apache/(\d+\.\d+).*$#iu",'$1',$version['0'])) ){
+		if($version < 2.4){
+			$apache_config = "Order allow,deny\n		Allow from all";
+		}else if($version >= 2.4){
+			$apache_config = "Require all granted";
+		}
+	}
+	
 	foreach($mods as $mod){
 		if(file_exists("$srv_path/$mod/mpak.cms")){
 			$path_engine[$mod]="$srv_path/$mod/mpak.cms";
@@ -20,6 +32,7 @@
 	function config($site){
 		global $srv_path;
 		global $path_engine;
+		global $apache_config;
 		$need_cms = preg_match('#^www\.#iUu',$site['name']);
 		$site['name_ascii'] = idn_to_ascii($site['name']);
 		$site['path_real'] = realpath($site['path']);
@@ -35,8 +48,7 @@
 	<Directory ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] ).">
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride All
-		Order allow,deny
-		Allow from all
+		{$apache_config}
 	</Directory>\n\n";
 	
 	if($site['mod']=='sslhosts'){
@@ -57,6 +69,7 @@
 	php_admin_value safe_mode_exec_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
 	php_admin_value doc_root ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
 	php_admin_value user_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+	php_admin_value short_open_tag 1
 	php_admin_value upload_tmp_dir /tmp
 #	php_admin_value allow_url_fopen 0
 	php_admin_value memory_limit 200M

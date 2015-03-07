@@ -1,12 +1,12 @@
 <?php
 
-	//начальные переменные
+	//РЅР°С‡Р°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 	$srv_path = realpath("./../");
 	$mods = array( 'vhosts', 'sslhosts');
-	$dir_exclusion  = array('.','..','mpak.cms');//исключения
-	$all_sites = array(); //массив со всеми собранными сайтами	
-	$srv_dir = scandir($srv_path); //сканируем дирректорию сервера
-	$path_engine = array();//путь к движку
+	$dir_exclusion  = array('.','..','mpak.cms');//РёСЃРєР»СЋС‡РµРЅРёСЏ
+	$all_sites = array(); //РјР°СЃСЃРёРІ СЃРѕ РІСЃРµРјРё СЃРѕР±СЂР°РЅРЅС‹РјРё СЃР°Р№С‚Р°РјРё	
+	$srv_dir = scandir($srv_path); //СЃРєР°РЅРёСЂСѓРµРј РґРёСЂСЂРµРєС‚РѕСЂРёСЋ СЃРµСЂРІРµСЂР°
+	$path_engine = array();//РїСѓС‚СЊ Рє РґРІРёР¶РєСѓ
 	foreach($mods as $mod){
 		if(file_exists("$srv_path/$mod/mpak.cms")){
 			$path_engine[$mod]="$srv_path/$mod/mpak.cms";
@@ -75,27 +75,27 @@
 		
 	
 	
-	//ищем все сайты
+	//РёС‰РµРј РІСЃРµ СЃР°Р№С‚С‹
 	foreach($mods as $mod){
 		if(in_array($mod,$srv_dir)){
-			//если существует папка vhosts или sslhosts
+			//РµСЃР»Рё СЃСѓС‰РµСЃС‚РІСѓРµС‚ РїР°РїРєР° vhosts РёР»Рё sslhosts
 			if(!in_array("$mod.conf",$srv_dir)){
-				//если нет папка для конфигов
-				mkdir("$srv_path/$mod.conf");//создаем папку
+				//РµСЃР»Рё РЅРµС‚ РїР°РїРєР° РґР»СЏ РєРѕРЅС„РёРіРѕРІ
+				mkdir("$srv_path/$mod.conf");//СЃРѕР·РґР°РµРј РїР°РїРєСѓ
 			}			
 			if(file_exists("$srv_path/$mod.conf")){
-				//если есть папка для конфигов
+				//РµСЃР»Рё РµСЃС‚СЊ РїР°РїРєР° РґР»СЏ РєРѕРЅС„РёРіРѕРІ
 				
-				//сканируем папку с сайтами
-				//груповая папка 1 уровня
+				//СЃРєР°РЅРёСЂСѓРµРј РїР°РїРєСѓ СЃ СЃР°Р№С‚Р°РјРё
+				//РіСЂСѓРїРѕРІР°СЏ РїР°РїРєР° 1 СѓСЂРѕРІРЅСЏ
 				foreach(scandir("$srv_path/$mod") as $item){
 					if(!in_array($item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item")){
 						if(preg_match('#\.$#iUu',$item)){
-							//груповая папка 2 уровня
+							//РіСЂСѓРїРѕРІР°СЏ РїР°РїРєР° 2 СѓСЂРѕРІРЅСЏ
 							foreach(scandir("$srv_path/$mod/$item") as $sub_item){
 								if(!in_array($sub_item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item/$sub_item")){
 									if(preg_match('#\.$#iUu',$sub_item)){
-										//груповая папка 3 уровня
+										//РіСЂСѓРїРѕРІР°СЏ РїР°РїРєР° 3 СѓСЂРѕРІРЅСЏ
 										foreach(scandir("$srv_path/$mod/$item/$sub_item") as $sub_sub_item){
 											if(!in_array($sub_sub_item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item/$sub_item/$sub_sub_item")){
 												$all_sites[] = array(
@@ -115,7 +115,7 @@
 								}
 							}
 						}else{
-							//просто сайт
+							//РїСЂРѕСЃС‚Рѕ СЃР°Р№С‚
 							$all_sites[] = array(
 								'mod'=>$mod,
 								'name'=>$item,
@@ -134,25 +134,25 @@
 	
 	
 	foreach($all_sites as $key1 => $site1){
-		//делаем проверку на дубликаты в оном и том же режиме (http/https)
+		//РґРµР»Р°РµРј РїСЂРѕРІРµСЂРєСѓ РЅР° РґСѓР±Р»РёРєР°С‚С‹ РІ РѕРЅРѕРј Рё С‚РѕРј Р¶Рµ СЂРµР¶РёРјРµ (http/https)
 		foreach($all_sites as $key2 => $site2){
-			if( $key1!=$key2 ){//если это не он сам
-				if($site1['mod'] == $site2['mod']){//если это один и тот же режим
-					if(preg_replace('#^www\.#iUu','',$site1['name']) == preg_replace('#^www\.#iUu','',$site2['name'])){//если доменны совпадают без учета отошения к движку
+			if( $key1!=$key2 ){//РµСЃР»Рё СЌС‚Рѕ РЅРµ РѕРЅ СЃР°Рј
+				if($site1['mod'] == $site2['mod']){//РµСЃР»Рё СЌС‚Рѕ РѕРґРёРЅ Рё С‚РѕС‚ Р¶Рµ СЂРµР¶РёРј
+					if(preg_replace('#^www\.#iUu','',$site1['name']) == preg_replace('#^www\.#iUu','',$site2['name'])){//РµСЃР»Рё РґРѕРјРµРЅРЅС‹ СЃРѕРІРїР°РґР°СЋС‚ Р±РµР· СѓС‡РµС‚Р° РѕС‚РѕС€РµРЅРёСЏ Рє РґРІРёР¶РєСѓ
 						exit("Detected a duplicate domain '".preg_replace('#^www\.#iUu','',$site1['name'])."' in the directories:\n'{$site1['path']}'\n'{$site2['path']}'\n");
 					}
 				}
 			}
 		}
-		//делаем проверку наличия движка для сайта
-		if(preg_match('#^www\.#iUu',$site1['name'])){//если сайт на движке
-			if(!$path_engine[$site1['mod']]){//нет движка
+		//РґРµР»Р°РµРј РїСЂРѕРІРµСЂРєСѓ РЅР°Р»РёС‡РёСЏ РґРІРёР¶РєР° РґР»СЏ СЃР°Р№С‚Р°
+		if(preg_match('#^www\.#iUu',$site1['name'])){//РµСЃР»Рё СЃР°Р№С‚ РЅР° РґРІРёР¶РєРµ
+			if(!$path_engine[$site1['mod']]){//РЅРµС‚ РґРІРёР¶РєР°
 				exit("Error: Not find folder 'mpak.cms' for '{$site1['mod']}'!\n");
 			}		
 		}
 	}
 	
-	//просто удаляем все конфиги
+	//РїСЂРѕСЃС‚Рѕ СѓРґР°Р»СЏРµРј РІСЃРµ РєРѕРЅС„РёРіРё
 	foreach($mods as $mod){
 		if(file_exists("$srv_path/$mod.conf")){
 			exec("rm -R -f $srv_path/$mod.conf/*");

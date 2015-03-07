@@ -49,6 +49,7 @@ if grep "Include /srv/www/vhosts.conf/" /etc/apache2/apache2.conf; then
 	echo "уже установлен"
 else
 	echo "Include /srv/www/vhosts.conf/" >> /etc/apache2/apache2.conf
+	echo "Include /srv/www/sslhosts.conf/" >> /etc/apache2/apache2.conf
 fi
 
 /etc/init.d/apache2 start

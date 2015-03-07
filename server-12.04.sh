@@ -59,13 +59,31 @@ aptitude install mysql-server
 /etc/init.d/mysql start
 
 #Скачиваем конфигурационные скрипты
-cd /srv/www/
-git clone https://github.com/demon2009g/mpak.su.config.git
-
+git clone https://github.com/demon2009g/mpak.su.config.git /srv/www/mpak.cms.config
 #Скачиваем движок
-cd /srv/www/vhosts/
-git clone https://github.com/mpak2/mpak.su.git mpak.cms
+git clone https://github.com/mpak2/mpak.su.git /srv/www/mpak.cms
 
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid
 # Storage key: a1e60231a1e6ce3ceda0d00fb651aa37
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

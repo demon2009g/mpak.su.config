@@ -14,11 +14,25 @@ sudo apt-get install aptitude # Устанавливает манагер при
 
 sudo aptitude install console-cyrillic
 
+sudo aptitude install nano 	# редактор
 sudo aptitude install iftop # Программа монитор сетевых соединений
 sudo aptitude install atop  # Программа монитор ресурсов
-sudo aptitude install apache2 # Стандартный веб сервер
-sudo aptitude install php5 libapache2-mod-php5 php5-cli php5-mysql # ДОполнительные модули к апачу
-sudo aptitude install libcurl3 libcurl3-dev php5-curl
+sudo aptitude install git-core # Контроль версий
+sudo aptitude install sed 	# потоковый текстовый редактор
+sudo aptitude install lynx 	# один из первых текстовых браузеров.
+
+sudo aptitude install apache2 apache2-doc libapache2-mod-php5 # Apache2
+sudo aptitude install php5 php5-cli php-pear				  # PHP
+sudo aptitude install mysql-server mysql-client php5-mysql	  # MySQL
+# Дополнительные модули к php
+sudo aptitude install php5-curl php5-gd php5-idn php5-imagick \
+php5-ldap php5-imap php5-memcache php5-mhash php5-ps php5-pspell\ 
+php5-sqlite php5-suhosin php5-tidy imagemagick php5-xcache 
+php5-xdebug php5-xmlrpc php5-xsl 
+
+sudo aptitude install phpmyadmin # Ставим phpMyAdmin
+
+sudo a2enmod rewrite 
 
 #export LANGUAGE=ru_RU.UTF-8 # Что то с кодировкой
 #export LC_ALL=ru_RU.UTF-8
@@ -26,37 +40,37 @@ sudo aptitude install libcurl3 libcurl3-dev php5-curl
 #dpkg-reconfigure locales
 
 mkdir /srv/www
+mkdir /srv/www/ssl
 mkdir /srv/www/vhosts
 mkdir /srv/www/vhosts.conf
 mkdir /srv/www/sslhosts
 mkdir /srv/www/sslhosts.conf
 
-apt-get install sed
-apt-get install lynx
-mkdir "/srv/www/vhosts/`lynx --dump http://ipecho.net/plain | sed 's/^[ \t]*//'`";
-
-sudo a2enmod rewrite # 
-aptitude install php5-gd # Библиотека которая занимается изменением размера изображений
+# mkdir "/srv/www/vhosts/`lynx --dump http://ipecho.net/plain | sed 's/^[ \t]*//'`";
 
 if grep "alias 'l=ls -l'" ~/.bashrc;
 then
-	echo "уже установлен"
+	echo "уже установлен\n"
 else
 	echo "alias 'l=ls -l'" >> ~/.bashrc
 fi
 
 if grep "Include /srv/www/vhosts.conf/" /etc/apache2/apache2.conf; then
-	echo "уже установлен"
+	echo "уже установлен\n"
 else
 	echo "Include /srv/www/vhosts.conf/" >> /etc/apache2/apache2.conf
 	echo "Include /srv/www/sslhosts.conf/" >> /etc/apache2/apache2.conf
 fi
 
-/etc/init.d/apache2 start
-aptitude install git-core
+if grep "Include /etc/phpmyadmin/apache.conf" /etc/apache2/apache2.conf; then
+	echo "уже установлен\n"
+else
+	echo "# Include phpmyadmin configurations:" >> /etc/apache2/apache2.conf
+	echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
+fi
 
-aptitude install mysql-server
-/etc/init.d/mysql start
+/etc/init.d/mysql restart
+/etc/init.d/apache2 restart
 
 #Скачиваем конфигурационные скрипты
 git clone https://github.com/demon2009g/mpak.su.config.git /srv/www/mpak.cms.config

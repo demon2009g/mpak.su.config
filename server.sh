@@ -39,6 +39,12 @@ sudo a2enmod rewrite
 #locale-gen ru_RU.UTF-8
 #dpkg-reconfigure locales
 
+# Меняем локализацию сервера с английского на русский
+# echo 'LANG="ru_RU.UTF-8"' > /etc/environment
+# echo 'ru_RU.UTF-8 UTF-8' >> /etc/locale.gen
+# locale-gen - запускаем команду для генерации локали.
+# Перезаходим на сервер.
+
 mkdir /srv/www
 mkdir /srv/www/ssl
 mkdir /srv/www/vhosts

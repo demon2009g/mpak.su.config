@@ -1,7 +1,6 @@
 <?php
-
 	//начальные переменные
-	$srv_path = realpath("./../");
+	$srv_path = realpath( __DIR__ . "/../");
 	$mods = array( 'vhosts', 'sslhosts');
 	$dir_exclusion  = array('.','..','mpak.cms');//исключения
 	$all_sites = array(); //массив со всеми собранными сайтами	

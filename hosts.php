@@ -41,8 +41,8 @@
 	ServerName {$site['name_ascii']}
 	ServerAlias ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."
 	DocumentRoot ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/
-#	ErrorLog {$site['path_real']}/ErrorLog.log
-#	CustomLog {$site['path_real']}/CustomLog.log common
+#	ErrorLog /var/log/apache2/{$site['name']}_ErrorLog.log
+#	CustomLog /var/log/apache2/{$site['name']}_CustomLog.log common
 
 	<Directory ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] ).">
 		Options Indexes FollowSymLinks MultiViews

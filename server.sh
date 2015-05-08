@@ -61,6 +61,12 @@ else
 	echo "alias 'l=ls -l'" >> ~/.bashrc
 fi
 
+if grep 'suhosin.executor.include.whitelist = "phar"' /etc/php5/cli/conf.d/suhosin.ini; then
+	echo "уже установлен\n"
+else
+	echo 'suhosin.executor.include.whitelist = "phar"' >> /etc/php5/cli/conf.d/suhosin.ini
+fi
+
 if grep "Include /srv/www/vhosts.conf/" /etc/apache2/apache2.conf; then
 	echo "уже установлен\n"
 else

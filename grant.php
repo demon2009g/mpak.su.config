@@ -1,7 +1,7 @@
 <?
 
 include "/srv/www/mpak.cms/include/mpfunc.php";
-include mpopendir($dir = __DIR__. '/'. $GLOBALS['argv'][1]. "/include/config.php");
+include $_SERVER['argv']['1']. "/include/config.php";
 
 echo "\nCREATE USER '{$conf['db']['login']}'@'localhost' IDENTIFIED BY '{$conf['db']['pass']}';\n";
 

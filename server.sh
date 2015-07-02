@@ -12,27 +12,28 @@ sudo apt-get update # Обновление всех источников
 sudo apt-get upgrade # Обновление всех программ
 sudo apt-get install aptitude # Устанавливает манагер приложений под линукс
 
-sudo aptitude install console-cyrillic
+sudo aptitude install console-cyrillic -y
 
-sudo aptitude install nano 	# редактор
-sudo aptitude install iftop # Программа монитор сетевых соединений
-sudo aptitude install atop  # Программа монитор ресурсов
-sudo aptitude install git-core # Контроль версий
-sudo aptitude install sed 	# потоковый текстовый редактор
-sudo aptitude install lynx 	# один из первых текстовых браузеров.
+sudo aptitude install nano -y 	# редактор
+sudo aptitude install iftop -y # Программа монитор сетевых соединений
+sudo aptitude install atop -y  # Программа монитор ресурсов
+sudo aptitude install git-core -y # Контроль версий
+sudo aptitude install sed -y 	# потоковый текстовый редактор
+sudo aptitude install lynx -y	# один из первых текстовых браузеров.
 
-sudo aptitude install apache2 apache2-doc libapache2-mod-php5 # Apache2
-sudo aptitude install php5 php5-cli php-pear				  # PHP
-sudo aptitude install mysql-server mysql-client php5-mysql	  # MySQL
+sudo aptitude install apache2 apache2-doc libapache2-mod-php5 -y # Apache2
+sudo aptitude install php5 php5-cli php-pear -y				 	 # PHP
+sudo aptitude install mysql-server mysql-client php5-mysql -y	 # MySQL
 # Дополнительные модули к php
 sudo aptitude install php5-curl php5-gd php5-idn php5-imagick \
 php5-ldap php5-imap php5-memcache php5-mhash php5-ps php5-pspell \
 php5-sqlite php5-suhosin php5-tidy imagemagick php5-xcache \
-php5-xdebug php5-xmlrpc php5-xsl 
+php5-xdebug php5-xmlrpc php5-xsl -y
 
-sudo aptitude install phpmyadmin # Ставим phpMyAdmin
+sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin
 
-sudo a2enmod rewrite 
+sudo a2enmod rewrite
+sudo a2enmod ssl 
 
 #export LANGUAGE=ru_RU.UTF-8 # Что то с кодировкой
 #export LC_ALL=ru_RU.UTF-8

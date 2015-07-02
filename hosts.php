@@ -51,14 +51,27 @@
 	</Directory>\n\n";
 	
 	if($site['mod']=='sslhosts'){
-	$config .= "
-	SSLEngine on
-	SSLProtocol all -SSLv2 
-	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM 
-
-	SSLCertificateFile ".(file_exists($fle_crt="$srv_path/ssl/{$site['name']}.crt")?$fle_crt:"$srv_path/ssl/default.crt")."
-	SSLCertificateKeyFile ".(file_exists($fle_crt="$srv_path/ssl/{$site['name']}.key")?$fle_crt:"$srv_path/ssl/default.key")."
-	";
+		$config .= "
+		SSLEngine on
+		SSLProtocol all -SSLv2 
+		SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM\n\n";
+		$sslFiles = scandir("$srv_path/ssl/");
+		if(!in_array("SSLCertificateFile.{$site['name']}.crt",$sslFiles)){
+			$config .= "
+			SSLCertificateFile $srv_path/ssl/default.crt
+			SSLCertificateKeyFile $srv_path/ssl/default.key";
+		}
+		
+		
+		foreach($sslFiles as $sslfile){
+			if(
+				!in_array($sslfile,array('.','..')) 
+					and 
+				preg_match("#^SSLCertificate\w+\.{$site['name']}#ui",$sslfile)
+			){
+				$config .= "		".preg_replace("#^(SSLCertificate\w+)\.{$site['name']}.+$#ui","$1",$sslfile) ." $srv_path/ssl/$sslfile\n";
+			}
+		}	
 	}
 	
 	$config .= "
@@ -101,15 +114,15 @@
 				//сканируем папку с сайтами
 				//груповая папка 1 уровня
 				foreach(scandir("$srv_path/$mod") as $item){
-					if(!in_array($item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item")){
+					if(!in_array($item,$dir_exclusion) AND !preg_match('#^\.#iu',$item) AND is_dir("$srv_path/$mod/$item")){
 						if(preg_match('#\.$#iUu',$item)){
 							//груповая папка 2 уровня
 							foreach(scandir("$srv_path/$mod/$item") as $sub_item){
-								if(!in_array($sub_item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item/$sub_item")){
+								if(!in_array($sub_item,$dir_exclusion) AND !preg_match('#^\.#iu',$sub_item) AND is_dir("$srv_path/$mod/$item/$sub_item")){
 									if(preg_match('#\.$#iUu',$sub_item)){
 										//груповая папка 3 уровня
 										foreach(scandir("$srv_path/$mod/$item/$sub_item") as $sub_sub_item){
-											if(!in_array($sub_sub_item,$dir_exclusion) AND is_dir("$srv_path/$mod/$item/$sub_item/$sub_sub_item")){
+											if(!in_array($sub_sub_item,$dir_exclusion) AND !preg_match('#^\.#iu',$sub_sub_item) AND is_dir("$srv_path/$mod/$item/$sub_item/$sub_sub_item")){
 												$all_sites[] = array(
 													'mod'=>$mod,
 													'name'=>$sub_sub_item,

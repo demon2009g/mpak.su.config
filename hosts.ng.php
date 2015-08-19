@@ -7,17 +7,6 @@
 	$srv_dir = scandir($srv_path); //сканируем дирректорию сервера
 	$path_engine = array();//путь к движку
 	
-	
-	//проверяем версию апача
-	exec("apache2 -v",$version);	
-	if($version = floatval(preg_replace("#^.*Apache/(\d+\.\d+).*$#iu",'$1',$version['0'])) ){
-		if($version < 2.4){
-			$apache_config = "Order allow,deny\n		Allow from all";
-		}else if($version >= 2.4){
-			$apache_config = "Require all granted";
-		}
-	}
-	
 	foreach($mods as $mod){
 		if(file_exists("$srv_path/$mod/mpak.cms")){
 			$path_engine[$mod]="$srv_path/$mod/mpak.cms";
@@ -36,65 +25,86 @@
 		$site['name_ascii'] = idn_to_ascii($site['name']);
 		$site['path_real'] = realpath($site['path']);
 		
-		$config = "<VirtualHost *:".($site['mod']=='vhosts' ? '80' : '443').">
-	ServerAdmin cms@mpak.su
-	ServerName {$site['name_ascii']}
-	ServerAlias ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."
-	DocumentRoot ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/
-#	ErrorLog /var/log/apache2/{$site['name']}_ErrorLog.log
-#	CustomLog /var/log/apache2/{$site['name']}_CustomLog.log common
+		
+		
+		$config="
+		server {
+				listen ".($site['mod']=='vhosts' ? '80' : '443').";
 
-	<Directory ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] ).">
-		Options Indexes FollowSymLinks MultiViews
-		AllowOverride All
-		{$apache_config}
-	</Directory>\n\n";
+				root ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/;	
+				index index.php index.html index.htm;
+
+				server_name {$site['name_ascii']} ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" ).";
+
+				location / {
+						try_files \$uri \$uri/ /index.html;
+				}
+
+				error_page 404 /404.html;
+
+				error_page 500 502 503 504 /50x.html;
+				location = /50x.html {
+					  root /usr/share/nginx/www;
+				}
+
+				# pass the PHP scripts to FastCGI server listening on the php-fpm socket
+				location ~ \.php$ {
+						try_files \$uri =404;
+						fastcgi_pass unix:/var/run/php5-fpm.sock;
+						fastcgi_index index.php;
+						fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+						include fastcgi_params;
+						
+				}
+				
+				fastcgi_param PHP_ADMIN_VALUE \"open_basedir={$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp\";
+				fastcgi_param PHP_ADMIN_VALUE \"safe_mode_include_dir=".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."\";
+				fastcgi_param PHP_VALUE \"include_path=".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."\";
+				fastcgi_param PHP_ADMIN_VALUE \"safe_mode_exec_dir=".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."\";
+				fastcgi_param PHP_ADMIN_VALUE \"doc_root=".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."\";
+				fastcgi_param PHP_ADMIN_VALUE \"user_dir=".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."\";
+				fastcgi_param PHP_ADMIN_VALUE \"short_open_tag=1\";
+		#		fastcgi_param PHP_ADMIN_VALUE \"allow_url_fopen=0\";
+				fastcgi_param PHP_ADMIN_VALUE \"memory_limit=200\";
+				fastcgi_param PHP_ADMIN_VALUE \"post_max_size=20M\";
+		#		fastcgi_param PHP_VALUE \"phar.readonly=Off\";
+
+				fastcgi_param PHP_ADMIN_VALUE \"allow_url_include=On\";
+				
+				fastcgi_param PHP_ADMIN_VALUE \"disable_functions=system\";
+				fastcgi_param PHP_ADMIN_VALUE \"disable_functions=exec,system,passthru,shell_exec,popen,pclose\";
+		#		fastcgi_param PHP_VALUE \"auto_prepend_file=/srv/www/sslhosts/s86.ru/ban/ban.php\";
+
+		}";
+
+
+
 	
-	if($site['mod']=='sslhosts'){
-		$config .= "
-		SSLEngine on
-		SSLProtocol all -SSLv2 
-		SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM\n\n";
-		$sslFiles = scandir("$srv_path/ssl/");
-		if(!in_array("SSLCertificateFile.{$site['name']}.crt",$sslFiles)){
+		/*if($site['mod']=='sslhosts'){
 			$config .= "
-			SSLCertificateFile $srv_path/ssl/default.crt
-			SSLCertificateKeyFile $srv_path/ssl/default.key";
-		}
-		
-		
-		foreach($sslFiles as $sslfile){
-			if(
-				!in_array($sslfile,array('.','..')) 
-					and 
-				preg_match("#^SSLCertificate\w+\.{$site['name']}#ui",$sslfile)
-			){
-				$config .= "		".preg_replace("#^(SSLCertificate\w+)\.{$site['name']}.+$#ui","$1",$sslfile) ." $srv_path/ssl/$sslfile\n";
+			SSLEngine on
+			SSLProtocol all -SSLv2 
+			SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM\n\n";
+			$sslFiles = scandir("$srv_path/ssl/");
+			if(!in_array("SSLCertificateFile.{$site['name']}.crt",$sslFiles)){
+				$config .= "
+				SSLCertificateFile $srv_path/ssl/default.crt
+				SSLCertificateKeyFile $srv_path/ssl/default.key";
 			}
-		}	
-	}
+			
+			
+			foreach($sslFiles as $sslfile){
+				if(
+					!in_array($sslfile,array('.','..')) 
+						and 
+					preg_match("#^SSLCertificate\w+\.{$site['name']}#ui",$sslfile)
+				){
+					$config .= "		".preg_replace("#^(SSLCertificate\w+)\.{$site['name']}.+$#ui","$1",$sslfile) ." $srv_path/ssl/$sslfile\n";
+				}
+			}	
+		}*/
 	
-	$config .= "
-	php_admin_value open_basedir {$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp
-	php_admin_value safe_mode_include_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_value include_path ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value safe_mode_exec_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value doc_root ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value user_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value short_open_tag 1
-	php_admin_value upload_tmp_dir /tmp
-#	php_admin_value allow_url_fopen 0
-	php_admin_value memory_limit 200M
-	php_admin_value post_max_size  20M
-#	php_value phar.readonly Off
 
-	php_admin_value allow_url_include On
-
-	php_admin_value disable_functions system
-	php_admin_value disable_functions \"exec,system,passthru,shell_exec,popen,pclose\"
-#	php_value auto_prepend_file /srv/www/sslhosts/s86.ru/ban/ban.php
-	
-</VirtualHost>";
 		file_put_contents("$srv_path/{$site['mod']}.conf/{$site['name']}.conf",$config);
 	}
 		
@@ -188,7 +198,7 @@
 		config($site);
 	}
 	
-	exec("/etc/init.d/apache2 restart");	
+	exec("/etc/init.d/nginx restart");	
 	
 	echo "End.\n";
 	

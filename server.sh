@@ -69,7 +69,7 @@ else
 	echo "alias 'l=ls -l'" >> ~/.bashrc
 fi
 
-if grep "alias vhosts=php -f /srv/www/mpak.cms.config/hosts.php" ~/.bashrc;
+if grep "alias 'vhosts=php -f /srv/www/mpak.cms.config/hosts.php'" ~/.bashrc;
 then
 	echo "уже установлен\n"
 else

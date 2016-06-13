@@ -35,12 +35,13 @@ sudo mv -v GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
 sudo aptitude install php5-curl php5-gd php5-idn php5-imagick \
 php5-ldap php5-imap php5-memcache php5-mhash php5-ps php5-pspell \
 php5-sqlite php5-suhosin php5-tidy imagemagick php5-xcache \
-php5-xdebug php5-xmlrpc php5-xsl php5-geoip -y
+php5-xdebug php5-xmlrpc php5-xsl php5-geoip php5-mcrypt -y
 
 sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin
 
 sudo a2enmod rewrite
-sudo a2enmod ssl 
+sudo a2enmod ssl
+sudo php5enmod mcrypt
 
 #export LANGUAGE=ru_RU.UTF-8 # Что то с кодировкой
 #export LC_ALL=ru_RU.UTF-8

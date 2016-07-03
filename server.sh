@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#start:
+# $ cd /tmp/; wget https://raw.githubusercontent.com/demon2009g/mpak.su.config/master/server.sh; chmod +x server.sh; ./server.sh;
+
 #sudo apt-get update 
 #sudo apt-get upgrade
 

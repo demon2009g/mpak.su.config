@@ -25,7 +25,7 @@ sudo aptitude install sed -y 	# потоковый текстовый редак
 sudo aptitude install lynx -y	# один из первых текстовых браузеров.
 
 
-
+sudo aptitude install memcached -y # memcach
 sudo aptitude install apache2 apache2-doc libapache2-mod-php5 -y # Apache2
 sudo aptitude install php5 php5-cli php-pear -y				 	 # PHP
 sudo aptitude install mysql-server mysql-client php5-mysql -y	 # MySQL

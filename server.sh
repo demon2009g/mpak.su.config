@@ -24,7 +24,7 @@ sudo aptitude install git-core -y # Контроль версий
 sudo aptitude install sed -y 	# потоковый текстовый редактор
 sudo aptitude install lynx -y	# один из первых текстовых браузеров.
 apt-get install rur unrar zip unzip -y # 
-apt-get install duplicity ncftp python-paramiko python-pycryptopp lftp python-boto python-dev librsync-dev # duplicity
+apt-get install duplicity ncftp python-paramiko python-pycryptopp lftp python-boto python-dev librsync-dev -y # duplicity
 
 
 sudo aptitude install memcached -y # memcach

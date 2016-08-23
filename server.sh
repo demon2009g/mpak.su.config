@@ -46,6 +46,8 @@ sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin
 
 sudo a2enmod rewrite
 sudo a2enmod ssl
+a2enmod headers
+apache2 -k graceful
 sudo php5enmod mcrypt
 
 #export LANGUAGE=ru_RU.UTF-8 # Что то с кодировкой

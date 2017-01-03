@@ -56,7 +56,7 @@
 					//$site['name']==$site['name_ascii'] пока поддерживаются только обычные домены
 					//вот когда будет поддержке IDN доменов вот тогда и будем думать как включить
 					if(!file_exists("/etc/letsencrypt/live/{$site['name']}")){
-						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} > /dev/null");						
+						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot --agree-tos -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} > /dev/null");						
 					}
 					if(file_exists("/etc/letsencrypt/live/{$site['name']}")){
 						$configSSL = "

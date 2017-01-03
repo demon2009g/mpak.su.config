@@ -60,7 +60,7 @@ mkdir -p /var/www/html/.well-known #letsencrypt
 
 echo "alias 'l=ls -l'" >> ~/.bashrc
 echo "alias 'vhosts=php -f /srv/www/mpak.cms.config/hosts.php'" >> ~/.bashrc
-echo "alias 'letsencrypt=/srv/www/letsencrypt/certbot-auto certonly --webroot -w /var/www/html --email admin@it-impulse.ru -d '" >> ~/.bashrc
+echo "alias 'letsencrypt=/srv/www/letsencrypt/certbot-auto certonly --webroot --agree-tos -w /var/www/html --email admin@it-impulse.ru -d '" >> ~/.bashrc
 
 #apache
 echo "Include /srv/www/vhosts.conf/apache" >> /etc/apache2/apache2.conf

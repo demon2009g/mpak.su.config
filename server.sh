@@ -3,7 +3,7 @@
 #start:
 # $ cd /tmp/; wget https://raw.githubusercontent.com/demon2009g/mpak.su.config/master/server.sh; chmod +x server.sh; ./server.sh;
 
-#sudo add-apt-repository ppa:ondrej/php -y # Репозитории php7.0
+sudo add-apt-repository ppa:ondrej/php -y # Репозитории php7.0
 sudo apt-get update -y # Обновление всех источников
 sudo apt-get upgrade -y # Обновление всех программ
 sudo apt-get install aptitude -y # Устанавливает манагер приложений под линукс
@@ -18,8 +18,7 @@ sudo aptitude install lynx -y	# один из первых текстовых б
 sudo aptitude install rar unrar zip unzip -y # Архиваторы 
 sudo aptitude install duplicity ncftp lftp python python-dev \
 python-paramiko python-pycryptopp python-boto make gcc \
-dialog libssl-dev libffi-dev librsync-dev \
-ca-certificates --no-install-recommends -y # duplicity + system
+dialog libssl-dev libffi-dev librsync-dev ca-certificates -y # duplicity + system
 sudo aptitude install sqlite3 -y # sqlite3
 sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf document.docx || soffice --headless --convert-to pdf document.docx
 
@@ -34,9 +33,9 @@ sudo mkdir -p /usr/share/GeoIP
 sudo mv GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
 # Дополнительные модули к php
 sudo aptitude install php7.0-curl php7.0-gd php7.0-intl php7.0-imagick \
-php7.0-ldap php7.0-imap php-memcache php7.0-ps php7.0-mbstring \
-php7.0-sqlite php7.0-sqlite3 php7.0-tidy imagemagick \
-php7.0-xdebug php7.0-xmlrpc php7.0-xsl php7.0-geoip php7.0-mcrypt -y
+php7.0-ldap php7.0-imap php-memcache php7.0-pspell php7.0-mbstring \
+php7.0-sqlite3 php7.0-tidy imagemagick php7.0-xdebug \
+php7.0-xmlrpc php7.0-xsl php7.0-geoip php7.0-mcrypt -y
 
 sudo aptitude install nginx -y #nginx
 sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin
@@ -124,6 +123,7 @@ git clone https://github.com/mpak2/mpak.su.git /srv/www/mpak.cms
 git clone https://github.com/letsencrypt/letsencrypt /srv/www/letsencrypt
 
 (crontab -u root -l; echo "30 2 * * 1 /srv/www/letsencrypt/certbot-auto renew >> /var/log/letsencrypt-renew.log #LetsenCrypt" ) | crontab -u root -
+/srv/www/letsencrypt/letsencrypt-auto
 
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid

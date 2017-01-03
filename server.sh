@@ -126,6 +126,8 @@ git clone https://github.com/mpak2/mpak.su.git /srv/www/mpak.cms
 #Скачиваем letsencrypt
 git clone https://github.com/letsencrypt/letsencrypt /srv/www/letsencrypt
 
+(crontab -u root -l; echo "30 2 * * 1 /srv/www/letsencrypt/certbot-auto renew >> /var/log/letsencrypt-renew.log #LetsenCrypt" ) | crontab -u root -
+
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid
 # Storage key: a1e60231a1e6ce3ceda0d00fb651aa37

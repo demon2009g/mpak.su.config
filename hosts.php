@@ -298,8 +298,8 @@
 		config($site);
 	}
 	
-	exec("/etc/init.d/nginx restart");	
-	exec("/etc/init.d/apache2 restart");	
+	exec("/etc/init.d/nginx reload");	//restart
+	exec("/etc/init.d/apache2 reload");	//restart
 	
 	echo "End.\n";
 	

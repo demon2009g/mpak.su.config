@@ -1,4 +1,8 @@
 Скрипты для настройки сервера <a href="https://github.com/mpak2/mpak.su" target="_blank">mpak.su</a>: <br/>
+<h3>v3.0</h3>
+<p>
+	Ubuntu 16.04 + Nginx + Apache + php7.0
+</p>
 <table>
 <tr>
   <td>

@@ -2,11 +2,11 @@
 	//начальные переменные
 	$srv_path = realpath( __DIR__ . "/../");
 	$mods = array( 'vhosts', 'sslhosts');
+	$modsports = array( 'vhosts'=>array(80,8080,'80','http'), 'sslhosts'=>array(443,993,'443 ssl','https'));
 	$dir_exclusion  = array('.','..','mpak.cms');//исключения
 	$all_sites = array(); //массив со всеми собранными сайтами	
 	$srv_dir = scandir($srv_path); //сканируем дирректорию сервера
 	$path_engine = array();//путь к движку
-	
 	
 	//проверяем версию апача
 	exec("apache2 -v",$version);	
@@ -32,70 +32,123 @@
 		global $srv_path;
 		global $path_engine;
 		global $apache_config;
+		global $mods;
+		global $modsports;
 		$need_cms = preg_match('#^www\.#iUu',$site['name']);
 		$site['name_ascii'] = idn_to_ascii($site['name']);
 		$site['path_real'] = realpath($site['path']);
 		
-		$config = "<VirtualHost *:".($site['mod']=='vhosts' ? '80' : '443').">
-	ServerAdmin cms@mpak.su
-	ServerName {$site['name_ascii']}
-	ServerAlias ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."
-	DocumentRoot ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/
-#	ErrorLog /var/log/apache2/{$site['name']}_ErrorLog.log
-#	CustomLog /var/log/apache2/{$site['name']}_CustomLog.log common
-
-	<Directory ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] ).">
-		Options Indexes FollowSymLinks MultiViews
-		AllowOverride All
-		{$apache_config}
-	</Directory>\n\n";
-	
-	if($site['mod']=='sslhosts'){
-		$config .= "
-		SSLEngine on
-		SSLProtocol all -SSLv2 
-		SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM\n\n";
-		$sslFiles = scandir("$srv_path/ssl/");
-		if(!in_array("SSLCertificateFile.{$site['name']}.crt",$sslFiles)){
-			$config .= "
-			SSLCertificateFile $srv_path/ssl/default.crt
-			SSLCertificateKeyFile $srv_path/ssl/default.key";
-		}
 		
 		
-		foreach($sslFiles as $sslfile){
-			if(
-				!in_array($sslfile,array('.','..')) 
-					and 
-				preg_match("#^SSLCertificate\w+\.{$site['name']}#ui",$sslfile)
-			){
-				$config .= "		".preg_replace("#^(SSLCertificate\w+)\.{$site['name']}.+$#ui","$1",$sslfile) ." $srv_path/ssl/$sslfile\n";
+		$config="
+		server {
+			listen {$modsports[$site['mod']][2]}; #IP и порт на котором слушает nginx
+			server_name {$site['name_ascii']} ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."; #указываем имена нашего сайта
+			server_name_in_redirect off;
+			add_header Access-Control-Allow-Origin *;\n";
+			
+			if($site['mod']=='sslhosts'){
+				if(is_dir("$srv_path/ssl/{$site['name']}")){
+					$SslDirHost = "$srv_path/ssl/{$site['name']}/nginx";
+				}else{					
+					$SslDirHost = "$srv_path/ssl/default/nginx";
+				}			
+				$config .= "\n\t\t\t\tkeepalive_timeout   70;\n". file_get_contents("$SslDirHost/ssl.conf")."\n\n";					
 			}
-		}	
-	}
-	
-	$config .= "
-	php_admin_value open_basedir {$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp
-	php_admin_value safe_mode_include_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_value include_path ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value safe_mode_exec_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value doc_root ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value user_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
-	php_admin_value short_open_tag 1
-	php_admin_value upload_tmp_dir /tmp
-#	php_admin_value allow_url_fopen 0
-	php_admin_value memory_limit 200M
-	php_admin_value post_max_size  20M
-#	php_value phar.readonly Off
+			$config .= "
+			
+			location / {
+				proxy_pass {$modsports[$site['mod']][3]}://127.0.0.1:{$modsports[$site['mod']][1]}/; #указываем ip и порт на котором теперь будет слушать Apache 
+				proxy_redirect off;
+				proxy_set_header Host \$host;
+				proxy_set_header X-Real-IP \$remote_addr;
+				proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+				proxy_set_header  X-Server-Address  \$server_addr;
+				client_max_body_size 200m;
+				client_body_buffer_size 128k;
+				proxy_connect_timeout 90;
+				proxy_send_timeout 90;
+				proxy_read_timeout 90;
+				proxy_buffer_size 4k;
+				proxy_buffers 4 32k;
+				proxy_busy_buffers_size 64k;
+				proxy_temp_file_write_size 10m;
+			}
+			
+			#phpmyadmin
+			location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+			   root /usr/share/;
+			}
+			
+			# Определяем местонахождение и расширения статичных файликов
+			#location ~* ^.+\.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|txt|tar|wav|bmp|rtf|js)$ {
+			#	root {$site['path_real']};
+			#}
+			
+			# Определяем местонахождение и расширения статичных файликов
+			location ~* ^.+\.(ts)$ {
+				root {$site['path_real']};
+			}
 
-	php_admin_value allow_url_include On
+			# htaccess и htpasswd не отдаем
+			location ~ /\.ht {
+				deny all;
+			}
+		}";
+		file_put_contents("$srv_path/{$site['mod']}.conf/nginx/{$site['name']}.conf",$config);
+		
+		
+			$config = "
+			<VirtualHost *:{$modsports[$site['mod']][1]}>
+				ServerAdmin cms@mpak.su
+				ServerName {$site['name_ascii']}
+				ServerAlias ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."
+				DocumentRoot ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/
+			#	ErrorLog /var/log/apache2/{$site['name']}_ErrorLog.log
+			#	CustomLog /var/log/apache2/{$site['name']}_CustomLog.log common
 
-	php_admin_value disable_functions system
-	php_admin_value disable_functions \"exec,system,passthru,shell_exec,popen,pclose\"
-#	php_value auto_prepend_file /srv/www/sslhosts/s86.ru/ban/ban.php
+				<Directory ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] ).">
+					Options Indexes FollowSymLinks MultiViews
+					AllowOverride All
+					{$apache_config}
+				</Directory>\n\n";
+				
 	
-</VirtualHost>";
-		file_put_contents("$srv_path/{$site['mod']}.conf/{$site['name']}.conf",$config);
+			if($site['mod']=='sslhosts'){
+				if(is_dir("$srv_path/ssl/{$site['name']}")){
+					$SslDirHost = "$srv_path/ssl/{$site['name']}/apache";
+				}else{					
+					$SslDirHost = "$srv_path/ssl/default/apache";
+				}				
+				$config .= "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";				
+			}
+	
+			$config .= "								
+				RemoteIPHeader X-Forwarded-For
+				RemoteIPTrustedProxy 127.0.0.1
+			
+				php_admin_value open_basedir {$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp
+				php_admin_value safe_mode_include_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+				php_value include_path ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+				php_admin_value safe_mode_exec_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+				php_admin_value doc_root ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+				php_admin_value user_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
+				php_admin_value short_open_tag 1
+				php_admin_value upload_tmp_dir /tmp
+			#	php_admin_value allow_url_fopen 0
+				php_admin_value memory_limit 200M
+				php_admin_value post_max_size  20M
+			#	php_value phar.readonly Off
+
+				php_admin_value allow_url_include On
+
+				php_admin_value disable_functions system
+				php_admin_value disable_functions \"exec,system,passthru,shell_exec,popen,pclose\"
+			#	php_value auto_prepend_file /srv/www/sslhosts/s86.ru/ban/ban.php
+				
+			</VirtualHost>";
+		file_put_contents("$srv_path/{$site['mod']}.conf/apache/{$site['name']}.conf",$config);	
+		
 	}
 		
 	
@@ -179,8 +232,11 @@
 	
 	//просто удаляем все конфиги
 	foreach($mods as $mod){
-		if(file_exists("$srv_path/$mod.conf")){
-			exec("rm -R -f $srv_path/$mod.conf/*");
+		if(file_exists("$srv_path/$mod.conf/apache")){
+			exec("rm -R -f $srv_path/$mod.conf/apache/*");
+		}
+		if(file_exists("$srv_path/$mod.conf/nginx")){
+			exec("rm -R -f $srv_path/$mod.conf/nginx/*");
 		}
 	}
 	
@@ -188,6 +244,7 @@
 		config($site);
 	}
 	
+	exec("/etc/init.d/nginx restart");	
 	exec("/etc/init.d/apache2 restart");	
 	
 	echo "End.\n";

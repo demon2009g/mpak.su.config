@@ -16,7 +16,10 @@ sudo aptitude install git-core -y # Контроль версий
 sudo aptitude install sed -y 	# потоковый текстовый редактор
 sudo aptitude install lynx -y	# один из первых текстовых браузеров.
 sudo aptitude install rar unrar zip unzip -y # Архиваторы 
-sudo aptitude install duplicity ncftp python-paramiko python-pycryptopp lftp python-boto python-dev librsync-dev -y # duplicity
+sudo aptitude install duplicity ncftp lftp python python-dev \
+python-paramiko python-pycryptopp python-boto make gcc \
+dialog libssl-dev libffi-dev librsync-dev \
+ca-certificates --no-install-recommends -y # duplicity + system
 sudo aptitude install sqlite3 -y # sqlite3
 sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf document.docx || soffice --headless --convert-to pdf document.docx
 
@@ -54,18 +57,31 @@ mkdir -p /srv/www/sslhosts.conf/nginx
 mkdir -p /srv/www/sslhosts.conf/apache
 mkdir -p /srv/www/vhosts.conf/apache
 mkdir -p /srv/www/vhosts.conf/nginx
+mkdir -p /var/www/html/.well-known #letsencrypt
 
 echo "alias 'l=ls -l'" >> ~/.bashrc
 echo "alias 'vhosts=php -f /srv/www/mpak.cms.config/hosts.php'" >> ~/.bashrc
+echo "alias 'letsencrypt=/srv/www/letsencrypt/certbot-auto certonly --webroot -w /var/www/html --email admin@it-impulse.ru -d '" >> ~/.bashrc
+
+#letsencrypt cron!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 #apache
 echo "Include /srv/www/vhosts.conf/apache" >> /etc/apache2/apache2.conf
 echo "Include /srv/www/sslhosts.conf/apache" >> /etc/apache2/apache2.conf
+
 sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf
 sed -i 's/Listen 443/Listen 993/g' /etc/apache2/ports.conf
 sed -i 's/VirtualHost \*:80/VirtualHost \*:8080/g' /etc/apache2/sites-available/000-default.conf
 sed -i 's/VirtualHost _default_:443/VirtualHost _default_:993/g' /etc/apache2/sites-available/default-ssl.conf
 sed -i 's/\%h/\%a/g' /etc/apache2/apache2.conf
+
+#apache letsencrypt
+echo "Alias /.well-known /var/www/html/.well-known" >> /etc/apache2/conf-enabled/letsencrypt.conf
+echo "<Directory /var/www/html/.well-known>" >> /etc/apache2/conf-enabled/letsencrypt.conf
+echo "Options Indexes FollowSymLinks MultiViews" >> /etc/apache2/conf-enabled/letsencrypt.conf
+echo "Require all granted" >> /etc/apache2/conf-enabled/letsencrypt.conf
+echo "</Directory>" >> /etc/apache2/conf-enabled/letsencrypt.conf
 
 #nginx
 sed -i '/tcp_nodelay on;/a\\tclient_max_body_size 100m;' /etc/nginx/nginx.conf
@@ -107,6 +123,8 @@ sed -i 's/mod_php5.c/mod_php7.c/g' /etc/phpmyadmin/apache.conf
 git clone https://github.com/demon2009g/mpak.su.config.git /srv/www/mpak.cms.config
 #Скачиваем движок
 git clone https://github.com/mpak2/mpak.su.git /srv/www/mpak.cms
+#Скачиваем letsencrypt
+git clone https://github.com/letsencrypt/letsencrypt /srv/www/letsencrypt
 
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid

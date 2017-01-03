@@ -33,13 +33,13 @@
 		global $path_engine;
 		global $apache_config;
 		global $mods;
-		global $modsports;
+		global $modsports;		
 		$need_cms = preg_match('#^www\.#iUu',$site['name']);
 		$site['name_ascii'] = idn_to_ascii($site['name']);
 		$site['path_real'] = realpath($site['path']);
 		
 		
-		
+		$configSSL = "";
 		$config="
 		server {
 			listen {$modsports[$site['mod']][2]}; #IP и порт на котором слушает nginx
@@ -49,12 +49,34 @@
 			
 			if($site['mod']=='sslhosts'){
 				if(is_dir("$srv_path/ssl/{$site['name']}")){
-					$SslDirHost = "$srv_path/ssl/{$site['name']}/nginx";
-				}else{					
-					$SslDirHost = "$srv_path/ssl/default/nginx";
-				}			
-				$config .= "\n\t\t\t\tkeepalive_timeout   70;\n". file_get_contents("$SslDirHost/ssl.conf")."\n\n";					
+					$SslDirHost = "{$srv_path}/ssl/{$site['name']}/nginx";
+					if(file_exists($SslDirHost))
+						$configSSL = "\n\t\t\t\tkeepalive_timeout   70;\n". file_get_contents("$SslDirHost/ssl.conf")."\n\n";
+				}else if($site['name']==$site['name_ascii']){
+					//$site['name']==$site['name_ascii'] пока поддерживаются только обычные домены
+					//вот когда будет поддержке IDN доменов вот тогда и будем думать как включить
+					if(!file_exists("/etc/letsencrypt/live/{$site['name']}")){
+						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} > /dev/null");						
+					}
+					if(file_exists("/etc/letsencrypt/live/{$site['name']}")){
+						$configSSL = "
+							keepalive_timeout   70;
+							ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
+							ssl_ciphers 'HIGH:!aNULL:!MD5:!kEDH';
+							ssl_certificate     /etc/letsencrypt/live/{$site['name']}/fullchain.pem;
+							ssl_certificate_key /etc/letsencrypt/live/{$site['name']}/privkey.pem;
+							#ssl_trusted_certificate /etc/letsencrypt/live/{$site['name']}/chain.pem
+							
+						";
+					}
+				}else{
+					$SslDirHost = "{$srv_path}/ssl/default/nginx";
+					if(file_exists($SslDirHost))
+						$configSSL = "\n\t\t\t\tkeepalive_timeout   70;\n". file_get_contents("$SslDirHost/ssl.conf")."\n\n";
+				}
 			}
+			$config .= $configSSL;
+			
 			$config .= "
 			
 			location / {
@@ -95,9 +117,14 @@
 				deny all;
 			}
 		}";
-		file_put_contents("$srv_path/{$site['mod']}.conf/nginx/{$site['name']}.conf",$config);
 		
+		if($site['mod']=='sslhosts' AND empty($configSSL)){
+			echo "Некорректная настройка Nginx SSL  для сайта {$site['name']}\n";
+		}else{
+			file_put_contents("{$srv_path}/{$site['mod']}.conf/nginx/{$site['name']}.conf",$config);
+		}
 		
+			$configSSL = "";
 			$config = "
 			<VirtualHost *:{$modsports[$site['mod']][1]}>
 				ServerAdmin cms@mpak.su
@@ -116,12 +143,32 @@
 	
 			if($site['mod']=='sslhosts'){
 				if(is_dir("$srv_path/ssl/{$site['name']}")){
-					$SslDirHost = "$srv_path/ssl/{$site['name']}/apache";
+					$SslDirHost = "{$srv_path}/ssl/{$site['name']}/apache";
+					if(file_exists($SslDirHost))
+						$configSSL = "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";
+				}else if($site['name']==$site['name_ascii']){
+					if(!file_exists("/etc/letsencrypt/live/{$site['name']}")){
+						//В nginx мы должны были создать
+						//походу произошла ошибка и не создалось
+					}
+					if(file_exists("/etc/letsencrypt/live/{$site['name']}")){
+						$configSSL = "							
+							SSLEngine on
+							SSLProtocol all -SSLv2 -SSLv3
+							SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM
+
+							SSLCertificateFile /etc/letsencrypt/live/{$site['name']}/cert.pem
+							SSLCertificateKeyFile /etc/letsencrypt/live/{$site['name']}/privkey.pem
+							SSLCertificateChainFile /etc/letsencrypt/live/{$site['name']}/chain.pem
+						";
+					}
 				}else{					
-					$SslDirHost = "$srv_path/ssl/default/apache";
-				}				
-				$config .= "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";				
+					$SslDirHost = "{$srv_path}/ssl/default/apache";
+					if(file_exists($SslDirHost))
+						$configSSL = "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";
+				}			
 			}
+			$config .= $configSSL;
 	
 			$config .= "								
 				RemoteIPHeader X-Forwarded-For
@@ -147,7 +194,14 @@
 			#	php_value auto_prepend_file /srv/www/sslhosts/s86.ru/ban/ban.php
 				
 			</VirtualHost>";
-		file_put_contents("$srv_path/{$site['mod']}.conf/apache/{$site['name']}.conf",$config);	
+			
+		
+		
+		if($site['mod']=='sslhosts' AND empty($configSSL)){
+			echo "Некорректная настройка Apache SSL  для сайта {$site['name']}\n";
+		}else{
+			file_put_contents("$srv_path/{$site['mod']}.conf/apache/{$site['name']}.conf",$config);	
+		}		
 		
 	}
 		

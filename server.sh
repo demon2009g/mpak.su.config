@@ -18,6 +18,7 @@ sudo aptitude install lynx -y	# один из первых текстовых б
 sudo aptitude install rar unrar zip unzip -y # Архиваторы 
 sudo aptitude install duplicity ncftp python-paramiko python-pycryptopp lftp python-boto python-dev librsync-dev -y # duplicity
 sudo aptitude install sqlite3 -y # sqlite3
+sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf document.docx || soffice --headless --convert-to pdf document.docx
 
 sudo aptitude install memcached -y # memcach
 sudo aptitude install apache2 apache2-doc libapache2-mod-php7.0 -y # Apache2

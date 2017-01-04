@@ -37,13 +37,14 @@
 		$need_cms = preg_match('#^www\.#iUu',$site['name']);
 		$site['name_ascii'] = idn_to_ascii($site['name']);
 		$site['path_real'] = realpath($site['path']);
+		$site['name_ascii_alias'] = $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}";
 		
 		
 		$configSSL = "";
 		$config="
 		server {
 			listen {$modsports[$site['mod']][2]}; #IP и порт на котором слушает nginx
-			server_name {$site['name_ascii']} ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."; #указываем имена нашего сайта
+			server_name {$site['name_ascii']} {$site['name_ascii_alias']}; #указываем имена нашего сайта
 			server_name_in_redirect off;
 			add_header Access-Control-Allow-Origin *;\n";
 			
@@ -55,17 +56,18 @@
 				}else if($site['name']==$site['name_ascii']){
 					//$site['name']==$site['name_ascii'] пока поддерживаются только обычные домены
 					//вот когда будет поддержке IDN доменов вот тогда и будем думать как включить
-					if(!file_exists("/etc/letsencrypt/live/{$site['name']}")){
-						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot --agree-tos -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} > /dev/null");						
+					$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name']}*"));
+					if(!file_exists($SSLDir)){
+						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot --agree-tos -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} -d {$site['name_ascii_alias']}> /dev/null");						
 					}
-					if(file_exists("/etc/letsencrypt/live/{$site['name']}")){
+					if(file_exists($SSLDir)){
 						$configSSL = "
 							keepalive_timeout   70;
 							ssl_protocols TLSv1 TLSv1.1 TLSv1.2; 
 							ssl_ciphers 'HIGH:!aNULL:!MD5:!kEDH';
-							ssl_certificate     /etc/letsencrypt/live/{$site['name']}/fullchain.pem;
-							ssl_certificate_key /etc/letsencrypt/live/{$site['name']}/privkey.pem;
-							#ssl_trusted_certificate /etc/letsencrypt/live/{$site['name']}/chain.pem
+							ssl_certificate {$SSLDir}/fullchain.pem;
+							ssl_certificate_key {$SSLDir}/privkey.pem;
+							#ssl_trusted_certificate {$SSLDir}/chain.pem
 							
 						";
 					}
@@ -129,7 +131,7 @@
 			<VirtualHost *:{$modsports[$site['mod']][1]}>
 				ServerAdmin cms@mpak.su
 				ServerName {$site['name_ascii']}
-				ServerAlias ".( $need_cms ? preg_replace('#^www\.#iUu','',$site['name_ascii']) : "www.{$site['name_ascii']}" )."
+				ServerAlias {$site['name_ascii_alias']}
 				DocumentRoot ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."/
 			#	ErrorLog /var/log/apache2/{$site['name']}_ErrorLog.log
 			#	CustomLog /var/log/apache2/{$site['name']}_CustomLog.log common
@@ -147,19 +149,20 @@
 					if(file_exists($SslDirHost))
 						$configSSL = "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";
 				}else if($site['name']==$site['name_ascii']){
-					if(!file_exists("/etc/letsencrypt/live/{$site['name']}")){
+					$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name']}*"));
+					if(!file_exists($SSLDir)){
 						//В nginx мы должны были создать
 						//походу произошла ошибка и не создалось
-					}
-					if(file_exists("/etc/letsencrypt/live/{$site['name']}")){
+					}					
+					if(file_exists($SSLDir)){						
 						$configSSL = "							
 							SSLEngine on
 							SSLProtocol all -SSLv2 -SSLv3
 							SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM
 
-							SSLCertificateFile /etc/letsencrypt/live/{$site['name']}/cert.pem
-							SSLCertificateKeyFile /etc/letsencrypt/live/{$site['name']}/privkey.pem
-							SSLCertificateChainFile /etc/letsencrypt/live/{$site['name']}/chain.pem
+							SSLCertificateFile {$SSLDir}/cert.pem
+							SSLCertificateKeyFile {$SSLDir}/privkey.pem
+							SSLCertificateChainFile {$SSLDir}/chain.pem
 						";
 					}
 				}else{					

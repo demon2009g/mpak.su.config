@@ -23,12 +23,12 @@
 				echo 'Ошибка открытия архива!\n';
 			}
 			
-			$link = mysql_connect('localhost', 'root', $pass);
+			$link = mysqli_connect('localhost', 'root', $pass);
 			foreach (scandir($settings['folder_bd']) as $file){
 				$fullfile = "{$settings['folder_bd']}/{$file}";
 				if (is_file($fullfile) and preg_match("#\.sql$#iu",$file)){	
 					$db_name = 	stripslashes(preg_replace("#\.sql$#iu",'',$file));					
-					mysql_query("CREATE DATABASE `{$db_name}` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci",$link);
+					mysqli_query($link,"CREATE DATABASE `{$db_name}` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
 					exec("mysql --user=root --password='{$pass}' {$db_name} < {$fullfile}\n");
 				}
 			}		
@@ -38,7 +38,7 @@
 			
 			foreach($premisions as $user_premisions){
 				foreach($user_premisions['premisions'] as $premision){
-					mysql_query($premision,$link);
+					mysqli_query($link,$premision);
 				}
 			}		
 			

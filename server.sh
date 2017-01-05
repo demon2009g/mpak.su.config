@@ -35,7 +35,7 @@ sudo mv GeoLiteCity.dat /usr/share/GeoIP/GeoIPCity.dat
 sudo aptitude install php7.0-curl php7.0-gd php7.0-intl php7.0-imagick \
 php7.0-ldap php7.0-imap php-memcache php7.0-pspell php7.0-mbstring \
 php7.0-sqlite3 php7.0-tidy imagemagick php7.0-xdebug php7.0-zip \
-php7.0-xmlrpc php7.0-xsl php7.0-geoip php7.0-mcrypt -y
+php7.0-xmlrpc php7.0-xsl php-geoip php7.0-dev libgeoip-dev php7.0-mcrypt -y
 
 sudo aptitude install nginx -y #nginx
 sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin

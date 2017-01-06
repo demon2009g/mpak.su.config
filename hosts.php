@@ -57,6 +57,8 @@
 					//$site['name']==$site['name_ascii'] пока поддерживаются только обычные домены
 					//вот когда будет поддержке IDN доменов вот тогда и будем думать как включить
 					$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name']}*"));
+					if(!file_exists($SSLDir))
+						$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name_ascii_alias']}*"));
 					if(!file_exists($SSLDir)){
 						exec("/srv/www/letsencrypt/certbot-auto certonly --webroot --agree-tos -w /var/www/html --email admin@it-impulse.ru -d {$site['name']} -d {$site['name_ascii_alias']}> /dev/null");						
 					}
@@ -150,6 +152,8 @@
 						$configSSL = "\n". file_get_contents("$SslDirHost/ssl.conf") ."\n\n";
 				}else if($site['name']==$site['name_ascii']){
 					$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name']}*"));
+					if(!file_exists($SSLDir))
+						$SSLDir = dirname(exec("find /etc/letsencrypt/live/{$site['name_ascii_alias']}*"));
 					if(!file_exists($SSLDir)){
 						//В nginx мы должны были создать
 						//походу произошла ошибка и не создалось

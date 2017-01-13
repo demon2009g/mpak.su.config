@@ -21,6 +21,7 @@ python-paramiko python-pycryptopp python-boto make gcc \
 dialog libssl-dev libffi-dev librsync-dev ca-certificates -y # duplicity + system
 sudo aptitude install sqlite3 -y # sqlite3
 sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf document.docx || soffice --headless --convert-to pdf document.docx
+chmod 777 /var/www/ #  Для того чтобы работал LibreOffice от пользователя www-data
 
 sudo aptitude install memcached -y # memcach
 sudo aptitude install apache2 apache2-doc libapache2-mod-php7.0 -y # Apache2

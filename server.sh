@@ -15,6 +15,7 @@ sudo aptitude install nload -y  # Программа монитор загруз
 sudo aptitude install git-core -y # Контроль версий
 sudo aptitude install sed -y 	# потоковый текстовый редактор
 sudo aptitude install lynx -y	# один из первых текстовых браузеров.
+sudo aptitude install sshpass -y	# pass for ssh.
 sudo aptitude install rar unrar zip unzip -y # Архиваторы 
 sudo aptitude install duplicity ncftp lftp python python-dev \
 python-paramiko python-pycryptopp python-boto make gcc \

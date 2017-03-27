@@ -17,6 +17,7 @@ sudo aptitude install sed -y 	# потоковый текстовый редак
 sudo aptitude install lynx -y	# один из первых текстовых браузеров.
 sudo aptitude install sshpass -y	# pass for ssh.
 sudo aptitude install rar unrar zip unzip -y # Архиваторы 
+sudo aptitude install sendmail -y # Отправка почты
 sudo aptitude install duplicity ncftp lftp python python-dev \
 python-paramiko python-pycryptopp python-boto make gcc \
 dialog libssl-dev libffi-dev librsync-dev ca-certificates -y # duplicity + system

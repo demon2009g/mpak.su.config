@@ -26,7 +26,7 @@ sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf do
 chmod 777 /var/www/ #  Для того чтобы работал LibreOffice от пользователя www-data
 
 sudo aptitude install memcached -y # memcach
-sudo aptitude install apache2 apache2-doc libapache2-mod-php7.0 -y # Apache2
+sudo aptitude install apache2 apache2-doc libapache2-mpm-itk libapache2-mod-php7.0 -y # Apache2
 sudo aptitude install php7.0 php-pear -y				 	 # PHP
 sudo aptitude install mysql-server mysql-client php7.0-mysql -y	 # MySQL
 # GeoIP php
@@ -51,6 +51,8 @@ sudo a2enmod headers
 sudo phpenmod pdo_mysql
 sudo phpenmod mysqlnd
 sudo phpenmod pdo_sqlite
+sudo a2enmod mpm_prefork
+sudo a2enmod mpm_itk
 
 mkdir -p /srv/www/ssl
 mkdir -p /srv/www/vhosts

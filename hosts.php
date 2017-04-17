@@ -181,7 +181,7 @@
 				RemoteIPHeader X-Forwarded-For
 				RemoteIPTrustedProxy 127.0.0.1
 			
-				php_admin_value open_basedir {$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp
+				php_admin_value open_basedir {$site['path_real']}:".( $need_cms ? "{$path_engine[$site['mod']]}:" : "" )."/tmp:/dev/urandom
 				php_admin_value safe_mode_include_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
 				php_value include_path ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."
 				php_admin_value safe_mode_exec_dir ".($need_cms ? $path_engine[$site['mod']] : $site['path_real'] )."

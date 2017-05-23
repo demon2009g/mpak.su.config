@@ -23,7 +23,6 @@ python-paramiko python-pycryptopp python-boto make gcc \
 dialog libssl-dev libffi-dev librsync-dev ca-certificates -y # duplicity + system
 sudo aptitude install sqlite3 -y # sqlite3
 sudo aptitude install libreoffice -y # LibreOffice  lowriter --convert-to pdf document.docx || soffice --headless --convert-to pdf document.docx
-chmod 777 /var/www/ #  Для того чтобы работал LibreOffice от пользователя www-data
 
 sudo aptitude install memcached -y # memcach
 sudo aptitude install apache2 apache2-doc libapache2-mpm-itk libapache2-mod-php7.0 -y # Apache2
@@ -42,6 +41,8 @@ php7.0-xmlrpc php7.0-xsl php-geoip php7.0-dev libgeoip-dev php7.0-mcrypt -y
 
 sudo aptitude install nginx -y #nginx
 sudo aptitude install phpmyadmin -y # Ставим phpMyAdmin
+
+chmod 777 /var/www/ #  Для того чтобы работал LibreOffice от пользователя www-data
 
 sudo a2enmod remoteip
 sudo a2enmod php7.0

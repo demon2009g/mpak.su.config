@@ -54,6 +54,7 @@ sudo phpenmod mysqlnd
 sudo phpenmod pdo_sqlite
 sudo a2enmod mpm_prefork
 sudo a2enmod mpm_itk
+sudo a2enmod expires
 
 mkdir -p /srv/www/ssl
 mkdir -p /srv/www/vhosts

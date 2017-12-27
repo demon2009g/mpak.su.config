@@ -111,8 +111,8 @@ sed -i 's/post_max_size = 8M/post_max_size = 200M/g' /etc/php/7.0/apache2/php.in
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /etc/php/7.0/apache2/php.ini
 sed -i 's/max_file_uploads = 20/max_file_uploads = 150/g' /etc/php/7.0/apache2/php.ini
 
-echo "extension=imap.so" >> /etc/php5/apache2/php.ini
-echo "extension=imap.so" >> /etc/php5/cli/php.ini
+echo "extension=imap.so" >> /etc/php/7.0/apache2/php.ini
+echo "extension=imap.so" >> /etc/php/7.0/cli/php.ini
 
 #phpmyadmin
 sed -i 's/mod_php.c/mod_php7.c/g' /etc/phpmyadmin/apache.conf

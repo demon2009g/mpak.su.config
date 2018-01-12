@@ -112,7 +112,7 @@ sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /etc/php/7.0/apa
 sed -i 's/max_file_uploads = 20/max_file_uploads = 150/g' /etc/php/7.0/apache2/php.ini
 
 echo "extension=imap.so" >> /etc/php/7.0/apache2/php.ini
-echo "extension=imap.so" >> /etc/php/7.0/cli/php.ini
+#echo "extension=imap.so" >> /etc/php/7.0/cli/php.ini
 
 #phpmyadmin
 sed -i 's/mod_php.c/mod_php7.c/g' /etc/phpmyadmin/apache.conf
@@ -132,7 +132,7 @@ git clone https://github.com/mpak2/mpak.su.git /srv/www/mpak.cms
 #Скачиваем letsencrypt
 git clone https://github.com/letsencrypt/letsencrypt /srv/www/letsencrypt
 
-(crontab -u root -l; echo "30 2 * * 1 /srv/www/letsencrypt/certbot-auto renew >> /var/log/letsencrypt-renew.log #LetsenCrypt" ) | crontab -u root -
+(crontab -u root -l; echo "30 2 * * 1 sudo /srv/www/letsencrypt/certbot-auto renew >> /var/log/letsencrypt-renew.log #LetsenCrypt" ) | crontab -u root -
 /srv/www/letsencrypt/letsencrypt-auto
 
 # Запуск фтп сервера для хранилища

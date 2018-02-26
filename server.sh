@@ -79,6 +79,10 @@ sed -i 's/VirtualHost \*:80/VirtualHost \*:8080/g' /etc/apache2/sites-available/
 sed -i 's/VirtualHost _default_:443/VirtualHost _default_:993/g' /etc/apache2/sites-available/default-ssl.conf
 sed -i 's/\%h/\%a/g' /etc/apache2/apache2.conf
 
+#apache
+rm /etc/apache2/conf-available/apache2-doc.conf
+rm /etc/apache2/conf-enabled/apache2-doc.conf
+
 #apache letsencrypt
 echo "Alias /.well-known /var/www/html/.well-known" >> /etc/apache2/conf-enabled/letsencrypt.conf
 echo "<Directory /var/www/html/.well-known>" >> /etc/apache2/conf-enabled/letsencrypt.conf

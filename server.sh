@@ -136,6 +136,8 @@ git clone https://github.com/letsencrypt/letsencrypt /srv/www/letsencrypt
 
 (crontab -u root -l; echo "30 2 * * 1 sudo /srv/www/letsencrypt/certbot-auto renew >> /var/log/letsencrypt-renew.log #LetsenCrypt" ) | crontab -u root -
 /srv/www/letsencrypt/letsencrypt-auto
+(crontab -u root -l; echo "35 2 * * 1 sudo /etc/init.d/apache2 reload #LetsenCrypt auto apply new certs" ) | crontab -u root -
+(crontab -u root -l; echo "35 2 * * 1 sudo /etc/init.d/nginx reload #LetsenCrypt auto apply new certs" ) | crontab -u root -
 
 # Запуск фтп сервера для хранилища
 # /usr/local/bin/ftpcloudfs -b 62.76.1.1 -p 2021 -a http://api.clodo.ru -l /var/log/ftpcloudfs.log --workers=4 --pid-file=/var/run/ftpcloudfs.pid

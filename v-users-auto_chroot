@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for user in $(grep '@' /etc/passwd |cut -f1 -d:); do
+	chmod -R -f $user:$user /home/$user/web/*/public_*html
+done

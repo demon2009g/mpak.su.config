@@ -1412,6 +1412,10 @@ $VESTA/bin/v-add-cron-job admin '*/5' '*' '*' '*' '*' "sudo $VESTA/bin/v-users-a
 sed -i 's/date.timezone = UTC/date.timezone = Europe\/Moscow/g' /etc/php/7.1/apache2/php.ini
 sed -i 's/date.timezone = UTC/date.timezone = Europe\/Moscow/g' /etc/php/7.1/cli/php.ini
 
+#Subsystem sftp /usr/lib/openssh/sftp-server
+#nano /etc/ssh/sshd_config
+
+
 ###############################################################################################
 
 # Congrats

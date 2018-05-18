@@ -1414,6 +1414,13 @@ sed -i 's/date.timezone = UTC/date.timezone = Europe\/Moscow/g' /etc/php/7.1/cli
 
 #Subsystem sftp /usr/lib/openssh/sftp-server
 #nano /etc/ssh/sshd_config
+#
+#Subsystem sftp internal-sftp
+#Match Group sftp-only
+#ChrootDirectory /chroot/%u
+#    AllowTCPForwarding no
+#    X11Forwarding no
+#    ForceCommand internal-sftp
 
 
 ###############################################################################################

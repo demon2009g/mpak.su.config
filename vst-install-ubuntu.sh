@@ -1408,6 +1408,9 @@ wget -O  $VESTA/bin/v-users-auto_chroot https://raw.githubusercontent.com/demon2
 chmod 0770 $VESTA/bin/v-users-auto_chroot
 $VESTA/bin/v-add-cron-job admin '*/5' '*' '*' '*' '*' "sudo $VESTA/bin/v-users-auto_chroot"
 
+#timezone
+sed -i 's/date.timezone = UTC/date.timezone = Europe\/Moscow/g' /etc/php/7.1/apache2/php.ini
+sed -i 's/date.timezone = UTC/date.timezone = Europe\/Moscow/g' /etc/php/7.1/cli/php.ini
 
 ###############################################################################################
 

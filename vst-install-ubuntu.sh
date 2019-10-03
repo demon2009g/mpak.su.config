@@ -1403,6 +1403,10 @@ sed -i "s/:%home%\/%user%\/tmp/:%home%\/%user%\/tmp:\/tmp/g" /usr/local/vesta/da
 sed -i "s/\$db_myadmin_link = \$_SESSION/\$db_myadmin_link = \"http:\/\/\".\$http_host.\$_SESSION/g" /usr/local/vesta/web/templates/admin/list_db.html
 sed -i "s/\$db_myadmin_link = \$_SESSION/\$db_myadmin_link = \"http:\/\/\".\$http_host.\$_SESSION/g" /usr/local/vesta/web/templates/user/list_db.html
 
+#ImageMagick
+sudo mv /etc/ImageMagick-6/policy.xml /etc/ImageMagick-6/policy.xmlout
+
+
 #users-auto_chroot
 wget -O  $VESTA/bin/v-users-auto_chroot https://raw.githubusercontent.com/demon2009g/mpak.su.config/master/v-users-auto_chroot
 chmod 0770 $VESTA/bin/v-users-auto_chroot

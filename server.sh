@@ -122,6 +122,9 @@ sed -i 's/mod_php5.c/mod_php7.c/g' /etc/phpmyadmin/apache.conf
 #echo "# Include phpmyadmin configurations:" >> /etc/apache2/apache2.conf
 #echo "Include /etc/phpmyadmin/apache.conf" >> /etc/apache2/apache2.conf
 
+#ImageMagick
+sudo mv /etc/ImageMagick-6/policy.xml /etc/ImageMagick-6/policy.xmlout
+
 /etc/init.d/mysql restart
 /etc/init.d/apache2 stop
 /etc/init.d/nginx start
